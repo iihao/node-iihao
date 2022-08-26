@@ -31,7 +31,9 @@
     Express不对Node.js已有的特性进行二次抽象，只是在它之上扩展了web应用所需的基本功能，内部使用的还是http模块，请求对象继承自http.IncomingMessage
     响应对象继承自http.ServerResponse
 
-    req.params.id 获取动态路径
+    req.params.id 获取动态路径(/user/:id)
+    req.query.id (localhost:3000/?id=2,得到2)
+    req.body  用在post请求当中,req.body.username获取用户名
     
     res.statusCode=201  //设置响应状态码
     res.write('')   //发送响应（响应结果）
@@ -42,12 +44,22 @@
     res.cookie('','') 发送cookie key+value
 
 ## 案例
+### 基础知识点
     添加fs文件处理模块
-    const fs = request('fs')
-    fs.readFile('文件路径',编码utf-8，回调函数(err,data))
+    const fs = request('fs') 
+    fs.readFile('文件路径',编码utf-8，回调函数(err,data)) 以异步的方式读取文件内容。
 
     es6 find(value => {} ) value 返回条件为true的结果
 
+    const path = request('path')
+    path.join(_dirname,/)  将多个参数字符串合并成一个路径字符串
+    __dirname：用来动态获取当前文件模块所属目录的绝对路径(必须两个下划线，不然打包报错)
+    __filename：用来动态获取当前文件的绝对路径
+
+    const {promisify} = require('util')
+    promisify() 将基于回调的函数转换为基于 Promise 的函数。
+
+### get请求
     app.get('/todos',(req,res) =>{
         fs.readFile('./db.json','utf-8',(err,data) =>{
             if(err){
@@ -60,5 +72,21 @@
         })
     })
 
-    const path = request('path')
-    path.join(__,/)
+### post请求
+1.获取客户端请求体
+    常见请求体格式(json   x-www-form-urlencoded)
+    app.use(express.json())  //配置解析表单请求体 application/json
+    app.use(express.urlencoded)  //配置解析表单请求体 x-www-form-urlencoded
+    获取请求数据：const todo = req.body
+2.数据验证
+    if(!todo.xxx){
+        return res.status(422).json({
+            error:''
+        })
+    }
+3.数据验证通过，把数据存储到db
+    writeFiles(path,data)
+
+4.发送响应
+    res.status(200).json(todo)
+    
