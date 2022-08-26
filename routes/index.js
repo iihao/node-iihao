@@ -1,6 +1,7 @@
-var express = require('express')
-var fs = require('fs')
-var app = express.Router()
+const express = require('express')
+const fs = require('fs')
+const { getDb, saveDb } = require('../utils/getdb')
+const app = express.Router()
 
 /* GET home page. */
 app.get('/', function (req, res, next) {
@@ -21,33 +22,53 @@ app.delete('/user', (req, res) => {
   res.send('Delete request at /user')
 })
 
-app.get('/todos', (req, res) => {
-  fs.readFile('./data.json','utf-8',(err,data)=>{
-    if(err){
-      res.status(500).json({
-        error:err.message
-      })
-    }
-    const db = JSON.parse(data)
+app.get('/todos', async (req, res) => {
+  try {
+    const db = await getDb()
     res.status(200).json(db.todos)
-  })
+  } catch (error) {
+    res.status(500).json({
+      error: error.message
+    })
+  }
 })
 
-app.get('/todos/:id',(req,res) =>{
-  fs.readFile('./data.json','utf-8',(err,data)=>{
-    if(err){
-      res.status(500).json({
-        error:err.message
-      }
-      )
+app.get('/todos/:id', async (req, res) => {
+  try {
+    const dbId = await getDb()
+    const todo = dbId.todos.find((val) => val.id === parseInt(req.params.id))
+    if (!todo) {
+      return res.status(404).json({ error: 404 })
+    } else {
+      res.status(200).json(todo)
     }
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
 
-    const dbId = JSON.parse(data)
-    const todo = dbId.todos.find((val)=> val.id === parseInt(req.params.id))
-    if(!todo){
-      return res.status(404)
+app.post('/todos', async (req, res) => {
+  try {
+    const todo = req.body
+    console.log(todo)
+    if (!todo.name) {
+      res.status(422).json({
+        error: '必须有name值'
+      })
+    } else {
+      const db = await getDb()
+      const todoMaxId = db.todos[db.todos.length - 1].id
+      todo.id = parseInt(todoMaxId) ? todoMaxId + 1 : 1
+      todo.name = todo.name || ''
+      todo.password = todo.password || '123456'
+      db.todos.push(todo)
+      await saveDb(db)
+      res.status(200).json(todo)
     }
-    res.status(200).json(todo)
-  })
+  } catch (error) {
+    res.status(500).json({
+      error: error.message
+    })
+  }
 })
 module.exports = app
