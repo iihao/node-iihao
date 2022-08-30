@@ -22,18 +22,16 @@ app.delete('/user', (req, res) => {
   res.send('Delete request at /user')
 })
 
-app.get('/todos', async (req, res) => {
+app.get('/todos', async (req, res, next) => {
   try {
     const db = await getDb()
     res.status(200).json(db.todos)
   } catch (error) {
-    res.status(500).json({
-      error: error.message
-    })
+    next(error)
   }
 })
 
-app.get('/todos/:id', async (req, res) => {
+app.get('/todos/:id', async (req, res, next) => {
   try {
     const dbId = await getDb()
     const todo = dbId.todos.find((val) => val.id === parseInt(req.params.id))
@@ -43,11 +41,11 @@ app.get('/todos/:id', async (req, res) => {
       res.status(200).json(todo)
     }
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    next(error)
   }
 })
 
-app.post('/todos', async (req, res) => {
+app.post('/todos', async (req, res, next) => {
   try {
     const todo = req.body
     console.log(todo)
@@ -66,9 +64,41 @@ app.post('/todos', async (req, res) => {
       res.status(200).json(todo)
     }
   } catch (error) {
-    res.status(500).json({
-      error: error.message
-    })
+    next(error)
+  }
+})
+
+app.patch('/todos/:id', async (req, res, next) => {
+  try {
+    const todo = req.body
+    const db = await getDb()
+    const newDb = db.todos.find((val) => val.id === parseInt(req.params.id))
+    if (!newDb) {
+      return res.status(404).end()
+    }
+    Object.assign(newDb, todo)
+    await saveDb(db)
+    res.status(200).json(newDb)
+  } catch (error) {
+    next(error)
+  }
+})
+
+app.delete('/todos/:id', async (req, res, next) => {
+  try {
+    const id = parseInt(req.params.id)
+    const db = await getDb()
+    const todos = db.todos
+    const todoIndex = todos.findIndex((val) => val.id === id)
+    console.log(todoIndex)
+    if (todoIndex === -1) {
+      return res.status(404).end()
+    }
+    todos.splice(todoIndex, 1)
+    await saveDb(db)
+    res.status(204).json({ status: '成功' })
+  } catch (error) {
+    next(error)
   }
 })
 module.exports = app
