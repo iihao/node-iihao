@@ -1,40 +1,17 @@
-var express = require('express')
-var router = express.Router()
+const express = require('express')
+const userCtrl = require('../controller/users')
+const router = express.Router()
 
 /* 登录 */
-router.post('/users/login', (req, res, next) => {
-  try {
-    res.send('post /users/login success')
-  } catch (error) {
-    next(error)
-  }
-})
+router.post('/users/login', userCtrl.userLogin)
 
 /*注册*/
-router.post('/users', (req, res, next) => {
-  try {
-    res.send('post /user success')
-  } catch (error) {
-    next(error)
-  }
-})
+router.post('/users', userCtrl.userRegistration)
 
 /*获取用户*/
-router.get('/user', (req, res, next) => {
-  try {
-    res.send('get /user success')
-  } catch (error) {
-    next(error)
-  }
-})
+router.get('/user', userCtrl.getUser)
 
 /*修改用户*/
-router.put('user', (req, res, next) => {
-  try {
-    res.send('put /user success')
-  } catch (error) {
-    next(error)
-  }
-})
+router.put('user', userCtrl.putUser)
 
 module.exports = router
