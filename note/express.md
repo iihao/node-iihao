@@ -43,7 +43,23 @@
     res.status(201).send('') 发送响应并返回状态码
     res.cookie('','') 发送cookie key+value
 
-##
+## 路由路径
+    Express 使用path-to-regexp来匹配路由路径
+    字符串模式 '/ab?cd'  匹配acd  abcd
+    '/ab*cd'  匹配 ab12cd  abesdcd
+    '/ab(cd)?e' 匹配abe  abcde
+    正则表达路径 /a/  匹配所有带a的任何内容
+    /.*fly$/  匹配butterfly  不匹配butterflyman 所有以fly结尾的
+
+## 路径参数
+    req.params.id 获取 '/users/:id/1'
+
+    通过- 或 . 分割
+    'users/:id-:name'  传入url:user/23-hq
+    req.params.id=23   req.params.name=hq
+
+    正则表达式 '/user/:userId(\d+)' 只传数字
+
 
 ## 案例
 ### 基础知识点
@@ -212,3 +228,49 @@ express.text() 解析text/plain格式请求体
 express.static() 托管静态资源文件
 
 ## 第三方中间件
+
+
+# 接口设计
+
+## RESTful接口设计规范
+协议：API与用户的通信协议，尽量使用HTTPs协议
+
+域名：应该尽量将API部署在专用域名下  api.xx.com
+    如果API很简单，可以考虑放到主域名下 xx.com/api
+
+版本：应该讲API的版本号放入URL  api.xx.com/v1/
+    版本变动不去修改原有接口，也可将版本号放到HTTP头
+
+路径：表示API的具体网址，网址中不能有动词，只能用名词。一般来说，数据库中的表都是同种记录的集合（collection） 所以api中的名词一般为复数
+
+HTTP动词：get(读取) post(创建) put(完整更新)    patch(部分更新) delete(删除)
+    不常用：head(获取元数据) options(获取信息)
+
+过滤信息：如果记录数量很多，API应该提供参数，过滤返回结果。
+    ?limit=10 :指定返回记录的数量
+    ？offset=10 :制定返回记录的开始位置
+    ？page=2 &per_page=100:指定第几页，以及每页的记录数
+    ？sortby=name&order = asc :指定返回结果按照哪个属性排序，以及排序顺序
+    ？animal_type_id=1:指定筛选条件
+    参数的设计允许存在冗余，允许API路径和URL参数偶尔重复
+
+状态码：状态码必须三位数
+    1xx:相关信息
+    2xx:操作成功
+    3xx:重定向
+    4xx:客户端错误
+    5xx:服务端错误
+
+返回结果：API返回的数据格式，不应该是纯文本，而应该是json对象 http头 Content-type设置为 application/json
+
+错误处理：
+    需要通过状态码反映发生的错误
+
+身份认证：基于jwt的接口权限
+    字段名：Authorization
+    字段值：Bearer token数据
+
+跨域处理：可以在服务器设置CORS允许客户端跨域资源请求
+
+
+## 案例
