@@ -6,6 +6,7 @@ const logger = require('morgan')
 
 const indexRouter = require('./routes/index')
 const errorHeadlers = require('./middleware/errorHandlers')
+require('./model')
 
 const app = express()
 
