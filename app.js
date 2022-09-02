@@ -2,10 +2,13 @@ const createError = require('http-errors')
 const express = require('express')
 const path = require('path')
 const cookieParser = require('cookie-parser')
-const logger = require('morgan')
+const logger = require('morgan') //日志
 
-const indexRouter = require('./routes/index')
-const errorHeadlers = require('./middleware/errorHandlers')
+const http = require('http')
+const { onError, onListening, normalizePort } = require('./utils/local')
+
+const indexRouter = require('./routes/index') //路由
+const errorHeadlers = require('./middleware/errorHandlers') //错误处理中间件
 require('./model')
 
 const app = express()
@@ -33,4 +36,12 @@ app.use((req, res, next) => {
 // error handler
 app.use(errorHeadlers())
 
-module.exports = app
+const port = normalizePort(process.env.PORT || '3030')
+app.set('port', port)
+
+const server = http.createServer(app)
+server.listen(port, () => {
+  console.log('Running at http://localhost:3030')
+})
+server.on('error', onError)
+server.on('listening', onListening)

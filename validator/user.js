@@ -34,7 +34,13 @@ exports.login = [
   ]),
   validate([
     body('user.email').custom(async (val, { req }) => {
-      const user = await User.findOne({ email: val }).select('password')
+      const user = await User.findOne({ email: val }).select([
+        'password',
+        'email',
+        'username',
+        'bio',
+        'image'
+      ])
       if (!user) {
         return Promise.reject('邮箱不存在')
       }
