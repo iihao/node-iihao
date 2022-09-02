@@ -1,9 +1,14 @@
 const { User } = require('../model/index')
+const md5 = require('../utils/md5')
 
 /*用户登录*/
 exports.userLogin = async (req, res, next) => {
   try {
-    res.send('userLogin')
+    const body = req.body
+    const user = new User(body.user)
+    res.status(200).json({
+      user
+    })
   } catch (error) {
     next(error)
   }
@@ -16,8 +21,12 @@ exports.userRegistration = async (req, res, next) => {
     const body = req.body
     //2、数据验证
     //3、数据保存到数据库
-    const user = new User(body.user)
+    let user = new User(body.user)
     await user.save()
+
+    user = user.toJSON()
+    delete user.password //去除返回密码
+
     //4、前端发送成功响应
     res.status(201).json({
       user
