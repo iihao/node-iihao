@@ -14,6 +14,6 @@ router.post('/users', useValidator.register, userCtrl.userRegistration)
 router.get('/user', authToken, userCtrl.getUser)
 
 /*修改用户*/
-router.put('user', userCtrl.putUser)
+router.put('/user', authToken, userCtrl.putUser)
 
 module.exports = router

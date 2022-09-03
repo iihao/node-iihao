@@ -1,9 +1,9 @@
 const jwt = require('../utils/jwt')
-const jwtSecret = require('../config/config.default')
+const { jwtSecret } = require('../config/config.default')
 const { User } = require('../model/index')
 
 const authToken = async (req, res, next) => {
-  const token = req.headers.Authorization
+  const token = req.headers.authorization
   console.log(token)
   if (!token) {
     return res.status(401).end()

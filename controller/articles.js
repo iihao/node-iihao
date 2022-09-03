@@ -1,3 +1,5 @@
+const { Article, User } = require('../model/index')
+
 /*获取所有文章*/
 exports.getArticles = async (req, res, next) => {
   try {
@@ -28,7 +30,20 @@ exports.getArticlesById = async (req, res, next) => {
 /*创建文章*/
 exports.postArticles = async (req, res, next) => {
   try {
-    res.send('postArticles')
+    const body = req.body
+    let article = new Article(body.article)
+    article.author = req.user._id || null
+
+    await article.save()
+
+    Article.find({ title: article.title })
+      .populate('author')
+      .exec((err, story) => {
+        if (err) return handleError(err)
+        res.status(200).json({
+          article: story
+        })
+      })
   } catch (error) {
     next(error)
   }

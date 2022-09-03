@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const { dbUrl } = require('../config/config.default')
 const userSchema = require('./user')
+const articleSchema = require('./article')
 
 mongoose.connect(dbUrl)
 
@@ -18,5 +19,6 @@ db.once('open', () => {
 
 //组织导出数据模型
 module.exports = {
-  User: mongoose.model('User', userSchema)
+  User: mongoose.model('user', userSchema),
+  Article: mongoose.model('article', articleSchema)
 }
