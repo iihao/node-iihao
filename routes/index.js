@@ -1,6 +1,12 @@
 const express = require('express')
 const router = express.Router()
 
+/*首页*/
+router.get('/', (req, res, next) => {
+  console.log(req.query)
+  res.render('index', { title: 'Express' })
+})
+
 /*用户*/
 router.use(require('./users'))
 
